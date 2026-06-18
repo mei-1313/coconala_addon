@@ -60,149 +60,143 @@
       padding-bottom: 8px;
       color: #0f172a;
     }
+
+    /* Style for Coconala buttons matching original specs slightly */
+    .d-button {
+      background: #ffffff;
+      border: 1px solid #22b163;
+      color: #22b163;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .d-button:hover {
+      background: #eafcf2;
+    }
+    .d-button:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+    .d-talkroomMessageList_showPastMessages {
+      padding: 12px;
+      text-align: center;
+      background: #f8fafc;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
   </style>
 </head>
 <body>
 
   <div class="test-banner">
-    <h1>ココナラトーク履歴保存アドオン テストページ</h1>
-    <p>このページは作成したブラウザ拡張機能のモック動作確認用です。実物のココナラトークルームのHTML構造を再現しています。</p>
+    <h1>ココナラトーク履歴保存アドオン テストページ (オートロード検証対応)</h1>
+    <p>このページは「過去のメッセージを見る」ボタンの自動クリック機能をテストするための模擬環境です。</p>
     <p><strong>動作検証方法：</strong></p>
     <ol>
-      <li>このファイルをそのままブラウザで開きます。</li>
-      <li>画面最下部に表示される<strong>「Coconala Talkroom Saver」の固定フッター</strong>を確認します。</li>
-      <li><strong>「JSON保存」</strong>ボタンをクリックします。</li>
-      <li>メッセージ一覧が正しく抽出され、JSONファイルがダウンロードされることを確認します。</li>
+      <li>このファイルをブラウザで開きます。</li>
+      <li>画面最下部にある<strong>「JSON保存」</strong>をクリックします。</li>
+      <li>アドオンが自動で<strong>「過去のメッセージを見る」</strong>ボタンを繰り返し検知してクリックします（計3回モックロードが走ります）。</li>
+      <li>フッターボタンの表記が「過去ログ読込中 (1回目)...」のように連動変化します。</li>
+      <li>すべての過去ログが展開されきると、最終的なメッセージ一覧がJSONとしてダウンロードされます。</li>
     </ol>
   </div>
 
   <div class="talkroom-mock">
     <h2>トークルーム メッセージ一覧（モックDOM）</h2>
     
-    <!-- INSERTED DOM STRUCTURE PROVIDED BY THE USER -->
-    <div data-v-41d71be6="" data-v-43f7ae04="" class="d-talkroomMessageList p-talkroomMessages_messageList" data-v-60ee68b6=""><div data-v-41d71be6="" class="d-talkroomMessageList_showPastMessages"><!----></div> <div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          5月29日
-        </div> <div data-v-32ff2f58="" data-v-41d71be6="" class="d-talkroomDefaultMessageList d-messageGroup_messageList"><!----> <div data-v-2e06d8b7="" data-v-32ff2f58="" class="d-talkroomMessage d-talkroomDefaultMessage js-requestForPurchaseMessage"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://dplhqivlpbfks.cloudfront.net/resize/coconala_profile/100x100/04d22f30c44d28970710499eab25a57ec8d4a9af70978ff178f2625d32b0ab4e/original/6851492/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" alt="自分" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="e06c804ddacfe"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">自分</div> <span data-v-737e5f90="" data-v-216a351c="" class="d-label d-messageInfo_label d-label-textGray700 d-label-hasBorder d-label-borderGray400 d-label-backgroundWhite" data-translate-observer-key="153da5e1790c17">自動送信</span> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          5月29日 21:43
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><div data-v-95440d16="" data-v-2e06d8b7="" class="d-defaultMessage" data-translate-observer-key="4267ee5d726ac">
-            <div class="d-requestForPurchaseMessage_2ZKkE">
-              <div class="d-requestForPurchaseMessage_title_3jsUO">
-                ■ 購入にあたってのお願い
-              </div>
+    <div data-v-41d71be6="" data-v-43f7ae04="" class="d-talkroomMessageList p-talkroomMessages_messageList" data-v-60ee68b6="">
+      
+      <!-- Mock Past Messages container containing the required button -->
+      <div data-v-41d71be6="" class="d-talkroomMessageList_showPastMessages">
+        <button type="submit" class="d-button is-outlined is-primary is-small" id="js-mock-load-btn" data-v-6285bdf2="" data-v-41d71be6="">
+          <span class="d-button_text" data-v-6285bdf2="">
+            過去のメッセージを見る
+          </span>
+        </button>
+      </div>
+
+      <div data-v-41d71be6="" class="d-messageGroup">
+        <div data-v-41d71be6="" class="d-messageGroup_date">5月29日</div>
+        <div data-v-32ff2f58="" data-v-41d71be6="" class="d-talkroomDefaultMessageList d-messageGroup_messageList">
+          <div data-v-2e06d8b7="" data-v-32ff2f58="" class="d-talkroomMessage d-talkroomDefaultMessage js-requestForPurchaseMessage">
+            <div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead">
+              <div data-v-216a351c="" class="d-messageInfo_userName">自分</div>
+              <span data-v-737e5f90="" class="d-label d-messageInfo_label">自動送信</span>
+              <div data-v-216a351c="" class="d-messageInfo_postTime">5月29日 21:43</div>
+            </div>
+            <div data-v-2e06d8b7="" class="d-talkroomMessage_main">
+              <div class="d-requestForPurchaseMessage_title_3jsUO">■ 購入にあたってのお願い</div>
               <p class="d-requestForPurchaseMessage_text_2FFFF">ご購入前にDMにご連絡ください．</p>
             </div>
-          </div> <!----> <!----> <!----> <!----> <!----></div></div><div data-v-2e06d8b7="" data-v-32ff2f58="" class="d-talkroomMessage d-talkroomDefaultMessage"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/system_coconala_100x100.png" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded d-userIcon-withBorder" data-intersection-observer-key="75b420c611b02"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">ココナラ</div> <span data-v-737e5f90="" data-v-216a351c="" class="d-label d-messageInfo_label d-label-textGray700 d-label-hasBorder d-label-borderGray400 d-label-backgroundWhite" data-translate-observer-key="18c292539f227">システムメッセージ</span> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          5月29日 21:43
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><div data-v-95440d16="" data-v-2e06d8b7="" class="d-defaultMessage" data-translate-observer-key="1ba4d42854adf4">
-            <div class="d-requestForAnyMessage_Qvtbh">
-              <div class="d-requestForAnyMessage_title_3otb_">
-                ■  ヒント：定期購入を提案してみませんか？
-              </div>
-              <p class="d-requestForAnyMessage_text_jwRQZ">
-                （この文章は購入者には表示されていません）<br>
-                この取引をきっかけにリピーターになってもらえるよう、定期購入を提案してみませんか？<br>
-                ココナラでは、購入者の方向けに「定期購入」のメリットや詳しい使い方を説明した動画をご用意しております。<br>
-                ご提案の際にぜひご活用ください。<br>
-                <br>
-                「定期購入」説明動画 of URL・ご提案例は<a href="/news/1210" target="_blank">こちら</a>
-              </p>
+          </div>
+        </div>
+        
+        <div data-v-41d71be6="" class="d-messageGroup_messageList" id="js-message-list-target">
+          <!-- Normal active room messages -->
+          <div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214213467">
+            <div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead">
+              <div data-v-216a351c="" class="d-messageInfo_userName">自分</div>
+              <div data-v-216a351c="" class="d-messageInfo_postTime">5月29日 22:15</div>
             </div>
-          </div> <!----> <!----> <!----> <!----> <!----></div></div></div> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214210723"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="b8f2fa2c213a0"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          5月29日 21:43
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">引き続き、よろしくお願いいたします！</p> <!----> <!----> <!----> <!----> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214213467"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://dplhqivlpbfks.cloudfront.net/resize/coconala_profile/100x100/04d22f30c44d28970710499eab25a57ec8d4a9af70978ff178f2625d32b0ab4e/original/6851492/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" alt="自分" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="17fd117dc89171"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">自分</div> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          5月29日 22:15
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">ご購入ありがとうございます。
-引き続きよろしくお願いいたします。</p> <!----> <!----> <!----> <div data-v-2e06d8b7="" class="d-talkroomMessage_readTime"><i data-v-1a7fbd1c="" data-v-2e06d8b7="" class="coconala-icon -check -is-ds2Gray400"></i>&nbsp;既読<span data-v-2e06d8b7="" class="d-talkroomMessage_displayReadTime">&nbsp;5月30日 20:37</span></div> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214213484"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/system_coconala_100x100.png" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded d-userIcon-withBorder" data-intersection-observer-key="1b9d253853a872"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">ココナラ</div> <span data-v-737e5f90="" data-v-216a351c="" class="d-label d-messageInfo_label d-label-textGray700 d-label-hasBorder d-label-borderGray400 d-label-backgroundWhite" data-translate-observer-key="1e3df9d9a0bddd">システムメッセージ</span> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          5月29日 22:15
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">納品予定日が登録されました。「納品予定日：2026/06/30」</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          5月31日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214331245"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="1ba64614dffc52"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          5月31日 20:56
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">配列について、コードを移し終わりました。
-お手数をおかけしますが、確認の程よろしくお願いいたします🙇🏻♀️</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月1日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214399940"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://dplhqivlpbfks.cloudfront.net/resize/coconala_profile/100x100/04d22f30c44d28970710499eab25a57ec8d4a9af70978ff178f2625d32b0ab4e/original/6851492/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" alt="自分" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="14cee83365072d"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">自分</div> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月1日 19:49
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">コード確認いたしました。
-大変良く書けていますね。
+            <div data-v-2e06d8b7="" class="d-talkroomMessage_main">
+              <p data-v-5e2aaa04="" class="d-normalMessage">ご購入ありがとうございます。引き続きよろしくお願いいたします。</p>
+              <div class="d-talkroomMessage_readTime">既読 5月30日 20:37</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-それでは以下の課題で配列に慣れていきましょう。
-<a class="d-normalMessage_link" target="_blank" rel="noopener" href="https://python.hisakatano.com/practice0/#03">https://python.hisakatano.com/practice0/#03</a>
-Practice: 03に挑戦してみてください。
-
-※append()を使っても良いですし、他の方法でもOKです。</p> <!----> <!----> <!----> <div data-v-2e06d8b7="" class="d-talkroomMessage_readTime"><i data-v-1a7fbd1c="" data-v-2e06d8b7="" class="coconala-icon -check -is-ds2Gray400"></i>&nbsp;既読<span data-v-2e06d8b7="" class="d-talkroomMessage_displayReadTime">&nbsp;6月2日 12:15</span></div> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月2日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214443423"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="149c952fdc574b"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月2日 12:15
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">確認いただき、ありがとうございます。
-承知しました！また今週中に提出させていただきます。</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月8日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214866629"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="9c3cef5e1e866"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月8日 12:43
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">mei_13様
-お世話になっております。
-先週提出とお伝えしておりましたが、
-本日になりそうです</p> <!----> <!----> <!----> <!----> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214867268"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://dplhqivlpbfks.cloudfront.net/resize/coconala_profile/100x100/04d22f30c44d28970710499eab25a57ec8d4a9af70978ff178f2625d32b0ab4e/original/6851492/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" alt="自分" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="ce8401d239c38"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">自分</div> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月8日 12:53
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">承知いたしました、お忙しい中だとは思いますが無理せずがんばっていきましょう。</p> <!----> <!----> <!----> <div data-v-2e06d8b7="" class="d-talkroomMessage_readTime"><i data-v-1a7fbd1c="" data-v-2e06d8b7="" class="coconala-icon -check -is-ds2Gray400"></i>&nbsp;既読<span data-v-2e06d8b7="" class="d-talkroomMessage_displayReadTime">&nbsp;6月8日 18:06</span></div> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214888263"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="df1c38b9a16a6"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月8日 18:07
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">🙇🏻♀️</p> <!----> <!----> <!----> <!----> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214898232"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="11f66bc3940b5c"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月8日 20:14
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">配列Practice: 03、完了いたしました！
-お手数をおかけしますが、確認頂けますと幸いです。
-よろしくお願いいたします。</p> <!----> <!----> <!----> <!----> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214907824"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://dplhqivlpbfks.cloudfront.net/resize/coconala_profile/100x100/04d22f30c44d28970710499eab25a57ec8d4a9af70978ff178f2625d32b0ab4e/original/6851492/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" alt="自分" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="1a2b4315010d7c"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">自分</div> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月8日 22:01
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">確認いたしました。こちらで完璧ですね。
-
-ここまででPythonの基礎構文は完了です。
-ここからは本格的なプログラムを作成するための学習となります。
-
-まずは「メイン関数」学んでいきます。
-メイン関数がなぜ必要なのかという話は以下を見ていただけたらと思います。
-<a class="d-normalMessage_link" target="_blank" rel="noopener" href="https://coconala.com/blogs/1162327/532334">https://coconala.com/blogs/1162327/532334</a>
-基本的には「保守性」と「可読性」のために必要なものという認識です。
-
-<a class="d-normalMessage_link" target="_blank" rel="noopener" href="https://python.hisakatano.com/samplecode/%E3%83%A1%E3%82%A4%E3%83%B3%E9%96%A2%E6%95%B0/#5-1">https://python.hisakatano.com/samplecode/%E3%83%A1%E3%82%A4%E3%83%B3%E9%96%A2%E6%95%B0/#5-1</a>
-それでは上記の5-1から5-3までを写して実行してみましょう。</p> <!----> <!----> <!----> <div data-v-2e06d8b7="" class="d-talkroomMessage_readTime"><i data-v-1a7fbd1c="" data-v-2e06d8b7="" class="coconala-icon -check -is-ds2Gray400"></i>&nbsp;既読<span data-v-2e06d8b7="" class="d-talkroomMessage_displayReadTime">&nbsp;6月9日 20:14</span></div> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月9日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-214972810"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="6a74c47aea66e"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月9日 20:15
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">承知しました！写して実行してみます。
-引き続きよろしくお願いします🙇🏻♀️</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月15日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-215407427"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="12fa138f9f9cad"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月15日 22:06
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">遅くなりすみません…！！明日の夜提出します！</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月16日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem d-talkroomMessage-isOthers" id="js-talkroomMessage-215469718"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="10cfc08fcf2547"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月16日 20:05
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">mei_13様
-        完了しました、お手数をおかけしますが
-        確認いただけますと幸いです。
-        よろしくお願いいたします。</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div><div data-v-41d71be6="" class="d-messageGroup"><div data-v-41d71be6="" class="d-messageGroup_date">
-          6月17日
-        </div> <!----> <div data-v-41d71be6="" class="d-messageGroup_messageList"><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-215528140"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://dplhqivlpbfks.cloudfront.net/resize/coconala_profile/100x100/04d22f30c44d28970710499eab25a57ec8d4a9af70978ff178f2625d32b0ab4e/original/6851492/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" alt="自分" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="15022998c286d7"></div> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><div data-v-216a351c="" href="/users" target="_blank" rel="noopener" class="d-messageInfo_userName">自分</div> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月17日 16:27
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">確認いたしました。しっかりと書けていますね。
-    
-    今後ははサンプルコードの中にmain関数が含まれていくことになります。
-    だんだんと慣れていければと思います。
-    
-    ここからは「ファイルの入出力」を扱っていきます。
-    実際のテキストファイルをPythonから作成したり、読み込んだりといった実践的なプログラムを学んでいきます。
-    
-    <a class="d-normalMessage_link" target="_blank" rel="noopener" href="https://python.hisakatano.com/samplecode/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%85%A5%E5%87%BA%E5%8A%9B/#8-1">https://python.hisakatano.com/samplecode/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%85%A5%E5%87%BA%E5%8A%9B/#8-1</a>
-    上記の8-1と8-2を写して実行してみましょう。
-    
-    8-1を実行すると「8-1_output.txt」が作成されます。
-    colabの左側、「フォルダマーク」をクリックすると、sample_dataの下に確認できると思います。
-    そちらのファイルを右クリックして「ダウンロード」を押して、自分のPCでその中身を確認してみましょう。
-    
-    確認の手順が少し複雑ですので、わからなくなったら遠慮なくご質問いただければと思います。</p> <!----> <!----> <!----> <div data-v-2e06d8b7="" class="d-talkroomMessage_readTime"><i data-v-1a7fbd1c="" data-v-2e06d8b7="" class="coconala-icon -check -is-ds2Gray400"></i>&nbsp;既読<span data-v-2e06d8b7="" class="d-talkroomMessage_displayReadTime">&nbsp;6月17日 20:29</span></div> <!----></div></div><div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem js-lastMessage d-talkroomMessage-last d-talkroomMessage-isOthers" id="js-talkroomMessage-215544314"><div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageHead_iconWrap"><img data-v-dfcc166c="" data-v-23117296="" data-v-216a351c="" src="https://coconala.com/images/no_image_person.svg" alt="" class="d-lazyImage d-userIcon d-messageHead_icon d-lazyImage-loaded" data-intersection-observer-key="1cfafc97194897"></a> <div data-v-216a351c="" class="d-messageInfo"><div data-v-216a351c="" class="d-messageInfo_left"><a data-v-216a351c="" href="/users/1985529" target="_blank" rel="noopener" class="d-messageInfo_userName d-messageInfo_userName-other">匿名希望7350</a> <!----> <!----></div> <div data-v-216a351c="" class="d-messageInfo_postTime">
-          6月17日 20:29
-        </div></div></div> <div data-v-2e06d8b7="" class="d-talkroomMessage_main"><p data-v-5e2aaa04="" data-v-2e06d8b7="" class="d-normalMessage">ご確認いただき、ありがとうございます。
-    完了次第、報告させていただきます。</p> <!----> <!----> <!----> <!----> <!----></div></div></div></div> <!----> <!----> <!----> <!----> <!----> <!----></div>
+    </div>
   </div>
+
+  <!-- Mock server-side paginated loader script for testing -->
+  <script>
+    const mockBtn = document.getElementById('js-mock-load-btn');
+    const msgContainer = document.getElementById('js-message-list-target');
+    let clickCount = 0;
+
+    if (mockBtn) {
+      mockBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        mockBtn.disabled = true;
+        mockBtn.querySelector('.d-button_text').textContent = '過去ログ取得中...';
+
+        setTimeout(() => {
+          clickCount++;
+          
+          // Create dummy past messages to prepend to the list
+          const dummyMsg = document.createElement('div');
+          dummyMsg.className = 'd-talkroomMessage d-messageListItem';
+          dummyMsg.innerHTML = `
+            <div class="d-messageHead">
+              <div class="d-messageInfo_userName">過去の購入者 (モック履歴 ${clickCount})</div>
+              <div class="d-messageInfo_postTime">5月28日 1${clickCount}:00</div>
+            </div>
+            <div class="d-talkroomMessage_main">
+              <p class="d-normalMessage">自動スクロール展開テスト用の過去メッセージです。(${clickCount}回展開分)</p>
+            </div>
+          `;
+          
+          msgContainer.insertBefore(dummyMsg, msgContainer.firstChild);
+
+          if (clickCount >= 3) {
+            // After 3 mock fetches, remove the button to simulate "no more history"
+            mockBtn.parentElement.remove();
+          } else {
+            // Re-enable for the next loop run
+            mockBtn.disabled = false;
+            mockBtn.querySelector('.d-button_text').textContent = '過去のメッセージを見る';
+          }
+        }, 800); // Simulate API latency of 800ms
+      });
+    }
+  </script>
 
   <!-- Load the extension content script -->
   <script src="content.js"></script>
