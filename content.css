@@ -1,0 +1,203 @@
+/* Container root */
+#coconala-talkroom-saver-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10000; /* Ensure it floats above ordinary page elements */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  pointer-events: none;
+}
+
+/* Glassmorphism footer bar */
+.csaver-footer {
+  width: 100%;
+  padding: 14px 28px;
+  background: rgba(15, 23, 42, 0.85); /* Premium slate-900 transparent */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+  animation: csaver-slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.csaver-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Title Styling */
+.csaver-title-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.csaver-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.csaver-title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e; /* Glowing green node */
+  border-radius: 50%;
+  box-shadow: 0 0 12px #22c55e;
+  animation: csaver-pulse-glow 2s infinite;
+}
+
+.csaver-subtitle {
+  color: #94a3b8; /* slate-400 */
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Button & Micro-interactions */
+.csaver-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #22c55e, #16a34a); /* Vibrant green gradient */
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.csaver-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+  background: linear-gradient(135deg, #25d366, #15803d);
+}
+
+.csaver-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.2);
+}
+
+.csaver-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Icon rotation/transition */
+.csaver-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.csaver-btn:hover .csaver-icon {
+  transform: translateY(1px);
+}
+
+/* Success state button */
+.csaver-btn-success {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7) !important; /* Premium Cyan Gradient */
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3) !important;
+  animation: csaver-pop-success 0.4s ease;
+}
+
+.csaver-btn-success .csaver-icon {
+  transform: scale(1.1);
+}
+
+/* Loading status style */
+.csaver-btn-loading {
+  position: relative;
+  color: transparent !important;
+}
+
+.csaver-btn-loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: calc(50% - 8px);
+  left: calc(50% - 8px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: csaver-spin 0.6s linear infinite;
+}
+
+/* Animations */
+@keyframes csaver-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes csaver-pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 10px #22c55e;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+    box-shadow: 0 0 16px #22c55e;
+  }
+}
+
+@keyframes csaver-pop-success {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes csaver-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive constraints */
+@media (max-width: 600px) {
+  .csaver-footer {
+    padding: 12px 18px;
+  }
+  .csaver-container {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 12px;
+  }
+  .csaver-title-wrapper {
+    align-items: center;
+  }
+  .csaver-btn {
+    width: 100%;
+  }
+}
