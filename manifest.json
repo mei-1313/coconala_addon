@@ -2,12 +2,13 @@
   "manifest_version": 3,
   "name": "ココナラ トーク履歴保存",
   "version": "1.0.0",
-  "description": "ココナラのトークルームのメッセージ履歴をJSONファイルとしてダウンロードします。",
+  "description": "ココナラのトークルームやダイレクトメッセージの履歴をJSONファイルとしてダウンロードします。",
   "permissions": [],
   "content_scripts": [
     {
       "matches": [
-        "https://coconala.com/talkrooms/*"
+        "https://coconala.com/talkrooms/*",
+        "https://coconala.com/mypage/direct_message/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],

@@ -1,6 +1,8 @@
 (function() {
-  // Global processing state to prevent duplicate clicks and overlap
+  // Global state variables
   let isProcessing = false;
+  let isDirectMessagePage = false;
+  let isTalkroomPage = false;
 
   // Cleanup existing footer UI
   function removeFooter() {
@@ -38,7 +40,7 @@
     btn.addEventListener('click', handleDownload);
   }
 
-  // Reset button layout and enable it again
+  // Reset button state
   function resetButton(btn, btnText) {
     isProcessing = false;
     if (!btn) return;
@@ -52,7 +54,62 @@
     `;
   }
 
-  // Core download handler
+  // Dynamic pagination finder
+  function findLoadMoreButton() {
+    if (isDirectMessagePage) {
+      // Direct Message "過去のメッセージを読み込む" button
+      const dmBtn = document.querySelector('.js_read-more-message');
+      if (dmBtn && dmBtn.textContent.includes('過去のメッセージを読み込む') && dmBtn.offsetParent !== null) {
+        return dmBtn;
+      }
+    } else {
+      // Talkroom "過去のメッセージを見る" button
+      const containerBtn = document.querySelector('.d-talkroomMessageList_showPastMessages button');
+      if (containerBtn && containerBtn.textContent.includes('過去のメッセージを見る')) {
+        return containerBtn;
+      }
+      const allButtons = document.querySelectorAll('button');
+      for (const b of allButtons) {
+        if (b.textContent.includes('過去のメッセージを見る')) {
+          return b;
+        }
+      }
+    }
+    return null;
+  }
+
+  // Loop expand history
+  async function expandAllHistory(btnText) {
+    let clickedCount = 0;
+    const maxClicks = 100;
+
+    while (clickedCount < maxClicks) {
+      const loadBtn = findLoadMoreButton();
+      if (!loadBtn) break;
+
+      // Handle direct message load triggers if it shows loading class
+      if (isDirectMessagePage && loadBtn.classList.contains('is-loading')) {
+        await sleep(200);
+        continue;
+      }
+
+      // Handle talkroom disabled buttons
+      if (!isDirectMessagePage && loadBtn.disabled) {
+        await sleep(200);
+        continue;
+      }
+
+      clickedCount++;
+      if (btnText) {
+        btnText.textContent = `過去ログ読込中 (${clickedCount}回目)...`;
+      }
+
+      loadBtn.click();
+      await sleep(1300); // Wait 1.3 seconds for server Ajax
+    }
+  }
+
+  // Main Download Trigger
   async function handleDownload() {
     const btn = document.getElementById('csaver-download-btn');
     if (!btn || isProcessing) return;
@@ -65,77 +122,144 @@
       btn.classList.add('csaver-btn-loading');
       btn.disabled = true;
 
-      // 1. Dynamically click and load all historical messages
+      // 1. Expand history
       btnText.textContent = '初期化中...';
       await expandAllHistory(btnText);
 
-      // 2. Parse active talk messages
+      // 2. Parse Messages based on page type
       btnText.textContent = 'データ解析中...';
-      await sleep(300); // UI buffer
+      await sleep(300);
 
       const messages = [];
-      const messageEls = document.querySelectorAll('.d-talkroomMessage');
 
-      messageEls.forEach((el, index) => {
-        try {
-          // Sender
-          const userNameEl = el.querySelector('.d-messageInfo_userName');
-          const sender = userNameEl ? userNameEl.textContent.trim() : '不明';
+      if (isDirectMessagePage) {
+        // --- PARSING DIRECT MESSAGES (DM) ---
+        const wrapper = document.getElementById('threadWrapper');
+        if (wrapper) {
+          const childEls = wrapper.children;
+          for (const el of childEls) {
+            try {
+              if (el.classList.contains('threadColomun')) {
+                // User Message
+                const userNameEl = el.querySelector('.threadUserName');
+                const sender = userNameEl ? userNameEl.textContent.trim() : '不明';
 
-          // Label
-          const labelEl = el.querySelector('.d-messageInfo_label');
-          const label = labelEl ? labelEl.textContent.trim() : null;
+                const postTimeEl = el.querySelector('.threadPostTime');
+                const postTime = postTimeEl ? postTimeEl.textContent.trim() : '';
 
-          // Post Time
-          const postTimeEl = el.querySelector('.d-messageInfo_postTime');
-          const postTime = postTimeEl ? postTimeEl.textContent.trim() : '';
+                const msgEl = el.querySelector('.threadMessage');
+                let content = '';
+                let links = [];
 
-          // Content and URLs
-          const mainEl = el.querySelector('.d-talkroomMessage_main');
-          let content = '';
-          let links = [];
+                if (msgEl) {
+                  const clone = msgEl.cloneNode(true);
+                  
+                  // Extract urls
+                  clone.querySelectorAll('a').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (href) {
+                      let absoluteUrl = href;
+                      if (href.startsWith('/')) {
+                        absoluteUrl = window.location.origin + href;
+                      }
+                      links.push({
+                        text: a.textContent.trim(),
+                        url: absoluteUrl
+                      });
+                    }
+                  });
 
-          if (mainEl) {
-            const clone = mainEl.cloneNode(true);
-            
-            // Clean up read tags
-            const readTimeEl = clone.querySelector('.d-talkroomMessage_readTime');
-            if (readTimeEl) {
-              readTimeEl.remove();
+                  // Extract text preferring original text without translation overlay
+                  const originalMsgEl = clone.querySelector('.js-translateMessageOriginalMessage');
+                  if (originalMsgEl) {
+                    content = originalMsgEl.innerText ? originalMsgEl.innerText.trim() : originalMsgEl.textContent.trim();
+                  } else {
+                    content = clone.innerText ? clone.innerText.trim() : clone.textContent.trim();
+                  }
+                }
+
+                if (sender !== '不明' || content) {
+                  messages.push({
+                    type: 'message',
+                    sender,
+                    postTime,
+                    content,
+                    links: links.length > 0 ? links : undefined
+                  });
+                }
+              } else if (el.classList.contains('threadNotice')) {
+                // System Notice
+                const content = el.textContent.trim();
+                if (content) {
+                  messages.push({
+                    type: 'notice',
+                    sender: 'システム',
+                    content
+                  });
+                }
+              }
+            } catch (dmError) {
+              console.warn('[Coconala Saver] Skipping DM message node due to parsing issue:', dmError);
+            }
+          }
+        }
+      } else {
+        // --- PARSING TALKROOM MESSAGES ---
+        const messageEls = document.querySelectorAll('.d-talkroomMessage');
+        messageEls.forEach((el, index) => {
+          try {
+            const userNameEl = el.querySelector('.d-messageInfo_userName');
+            const sender = userNameEl ? userNameEl.textContent.trim() : '不明';
+
+            const labelEl = el.querySelector('.d-messageInfo_label');
+            const label = labelEl ? labelEl.textContent.trim() : null;
+
+            const postTimeEl = el.querySelector('.d-messageInfo_postTime');
+            const postTime = postTimeEl ? postTimeEl.textContent.trim() : '';
+
+            const mainEl = el.querySelector('.d-talkroomMessage_main');
+            let content = '';
+            let links = [];
+
+            if (mainEl) {
+              const clone = mainEl.cloneNode(true);
+              const readTimeEl = clone.querySelector('.d-talkroomMessage_readTime');
+              if (readTimeEl) {
+                readTimeEl.remove();
+              }
+
+              clone.querySelectorAll('a').forEach(a => {
+                const href = a.getAttribute('href');
+                if (href) {
+                  let absoluteUrl = href;
+                  if (href.startsWith('/')) {
+                    absoluteUrl = window.location.origin + href;
+                  }
+                  links.push({
+                    text: a.textContent.trim(),
+                    url: absoluteUrl
+                  });
+                }
+              });
+
+              content = clone.innerText ? clone.innerText.trim() : clone.textContent.trim();
             }
 
-            // Extract links
-            clone.querySelectorAll('a').forEach(a => {
-              const href = a.getAttribute('href');
-              if (href) {
-                let absoluteUrl = href;
-                if (href.startsWith('/')) {
-                  absoluteUrl = window.location.origin + href;
-                }
-                links.push({
-                  text: a.textContent.trim(),
-                  url: absoluteUrl
-                });
-              }
-            });
-
-            content = clone.innerText ? clone.innerText.trim() : clone.textContent.trim();
+            if (sender !== '不明' || content) {
+              messages.push({
+                type: 'message',
+                sender,
+                label: label || undefined,
+                postTime,
+                content,
+                links: links.length > 0 ? links : undefined
+              });
+            }
+          } catch (trError) {
+            console.warn(`[Coconala Saver] Skipping talkroom message node index ${index} due to parsing issue:`, trError);
           }
-
-          if (sender !== '不明' || content) {
-            messages.push({
-              sender,
-              label,
-              postTime,
-              content,
-              links: links.length > 0 ? links : undefined
-            });
-          }
-        } catch (elError) {
-          // Gracefully skip failed message nodes without aborting the save process
-          console.warn(`[Coconala Saver] Skipping message node index ${index} due to parsing issue:`, elError);
-        }
-      });
+        });
+      }
 
       if (messages.length === 0) {
         alert('保存するメッセージが見つかりませんでした。');
@@ -143,19 +267,30 @@
         return;
       }
 
-      // 3. Package and trigger the file download
+      // 3. Packaging file and triggering download
       const jsonString = JSON.stringify(messages, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
 
-      // Extract talkroom ID
+      // File name formatting based on page type
       const pathParts = window.location.pathname.split('/');
-      const talkroomIndex = pathParts.indexOf('talkrooms');
-      const talkroomId = (talkroomIndex !== -1 && pathParts[talkroomIndex + 1]) 
-        ? pathParts[talkroomIndex + 1] 
-        : 'unknown';
+      let prefix = 'coconala_talkroom';
+      let pageId = 'unknown';
 
-      // Timestamps
+      if (isDirectMessagePage) {
+        prefix = 'coconala_dm';
+        const dmIndex = pathParts.indexOf('direct_message');
+        if (dmIndex !== -1 && pathParts[dmIndex + 1]) {
+          pageId = pathParts[dmIndex + 1];
+        }
+      } else {
+        prefix = 'coconala_talkroom';
+        const talkroomIndex = pathParts.indexOf('talkrooms');
+        if (talkroomIndex !== -1 && pathParts[talkroomIndex + 1]) {
+          pageId = pathParts[talkroomIndex + 1];
+        }
+      }
+
       const now = new Date();
       const formattedDate = now.getFullYear() +
         ('0' + (now.getMonth() + 1)).slice(-2) +
@@ -164,7 +299,7 @@
         ('0' + now.getMinutes()).slice(-2) +
         ('0' + now.getSeconds()).slice(-2);
 
-      const filename = `coconala_talkroom_${talkroomId}_${formattedDate}.json`;
+      const filename = `${prefix}_${pageId}_${formattedDate}.json`;
 
       const a = document.createElement('a');
       a.href = url;
@@ -174,7 +309,7 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // 4. Handle success view feedback
+      // 4. Success layout indicator
       btn.classList.remove('csaver-btn-loading');
       btn.classList.add('csaver-btn-success');
       btn.innerHTML = `
@@ -189,69 +324,32 @@
       }, 3500);
 
     } catch (error) {
-      console.error('[Coconala Saver] Execution Failed:', error);
+      console.error('[Coconala Saver] Failed:', error);
       alert('保存中にエラーが発生しました: ' + error.message);
       resetButton(btn, btnText);
     }
   }
 
-  // Sleep helper
+  // Sleep Helper
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Find target pagination button
-  function findLoadMoreButton() {
-    const containerBtn = document.querySelector('.d-talkroomMessageList_showPastMessages button');
-    if (containerBtn && containerBtn.textContent.includes('過去のメッセージを見る')) {
-      return containerBtn;
-    }
-    const allButtons = document.querySelectorAll('button');
-    for (const b of allButtons) {
-      if (b.textContent.includes('過去のメッセージを見る')) {
-        return b;
-      }
-    }
-    return null;
-  }
-
-  // Recursively fetch past history
-  async function expandAllHistory(btnText) {
-    let clickedCount = 0;
-    const maxClicks = 100;
-
-    while (clickedCount < maxClicks) {
-      const loadBtn = findLoadMoreButton();
-      if (!loadBtn) break;
-
-      if (loadBtn.disabled) {
-        await sleep(200);
-        continue;
-      }
-
-      clickedCount++;
-      if (btnText) {
-        btnText.textContent = `過去ログ読込中 (${clickedCount}回目)...`;
-      }
-
-      loadBtn.click();
-      await sleep(1200); // Standardize request wait time to 1.2s
-    }
-  }
-
-  // Periodic URL and Page Watcher (SPA & Local mock pages dynamic transition support)
+  // Dynamic page check
   function checkPageStatus() {
-    const isTalkroom = window.location.pathname.includes('/talkrooms/') || 
-                       window.location.pathname.includes('test_environment.html');
+    isDirectMessagePage = window.location.pathname.includes('/direct_message/') || 
+                         (window.location.pathname.includes('test_environment.html') && window.location.hash === '#direct_message');
     
-    if (isTalkroom) {
+    isTalkroomPage = window.location.pathname.includes('/talkrooms/') || 
+                     (window.location.pathname.includes('test_environment.html') && window.location.hash !== '#direct_message');
+
+    if (isTalkroomPage || isDirectMessagePage) {
       createFooter();
     } else {
       removeFooter();
     }
   }
 
-  // Loop check every 1s
+  // SPA-friendly checker loop
   setInterval(checkPageStatus, 1000);
-  // Initial check
   checkPageStatus();
 
 })();

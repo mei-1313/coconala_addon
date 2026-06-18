@@ -44,6 +44,37 @@
     .test-banner li {
       margin-bottom: 4px;
     }
+
+    /* Tab UI design */
+    .test-tabs {
+      display: flex;
+      gap: 8px;
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+    }
+    .test-tab-btn {
+      padding: 10px 20px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+    .test-tab-btn:hover {
+      background: #f8fafc;
+      color: #334155;
+    }
+    .test-tab-btn.is-active {
+      background: #22c55e;
+      border-color: #22c55e;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+    }
+
     .talkroom-mock {
       max-width: 800px;
       margin: 0 auto;
@@ -52,6 +83,10 @@
       border-radius: 8px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       border: 1px solid #e2e8f0;
+      display: none;
+    }
+    .talkroom-mock.is-active {
+      display: block;
     }
     .talkroom-mock h2 {
       margin-top: 0;
@@ -61,7 +96,7 @@
       color: #0f172a;
     }
 
-    /* Style for Coconala buttons matching original specs slightly */
+    /* Style for Coconala buttons */
     .d-button {
       background: #ffffff;
       border: 1px solid #22b163;
@@ -90,110 +125,294 @@
       border-radius: 6px;
       margin-bottom: 16px;
     }
+
+    /* Direct Messages specific classes provided by Coconala */
+    .threadColomun {
+      display: flex;
+      padding: 16px 0;
+      border-bottom: 1px solid #f1f5f9;
+      gap: 12px;
+    }
+    .threadUserImg {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      object-fit: cover;
+    }
+    .threadText {
+      flex: 1;
+    }
+    .threadHeader {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .threadUserName {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 13px;
+    }
+    .threadPostTime {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+    .threadMessage {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #334155;
+    }
+    .threadNotice {
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #64748b;
+      text-align: center;
+      margin: 12px 0;
+    }
+    .js_read-more-message {
+      padding: 12px;
+      text-align: center;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      color: #0ea5e9;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .js_read-more-message:hover {
+      background: #f0f9ff;
+      border-color: #0ea5e9;
+    }
+    .js_read-more-message.is-loading {
+      cursor: wait;
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
 
   <div class="test-banner">
-    <h1>ココナラトーク履歴保存アドオン テストページ (オートロード検証対応)</h1>
-    <p>このページは「過去のメッセージを見る」ボタンの自動クリック機能をテストするための模擬環境です。</p>
+    <h1>ココナラトーク履歴保存アドオン テストページ</h1>
+    <p>ココナラの<strong>トークルーム</strong>と<strong>ダイレクトメッセージ（DM）</strong>の双方のHTML構造に対応しています。</p>
     <p><strong>動作検証方法：</strong></p>
     <ol>
-      <li>このファイルをブラウザで開きます。</li>
-      <li>画面最下部にある<strong>「JSON保存」</strong>をクリックします。</li>
-      <li>アドオンが自動で<strong>「過去のメッセージを見る」</strong>ボタンを繰り返し検知してクリックします（計3回モックロードが走ります）。</li>
-      <li>フッターボタンの表記が「過去ログ読込中 (1回目)...」のように連動変化します。</li>
-      <li>すべての過去ログが展開されきると、最終的なメッセージ一覧がJSONとしてダウンロードされます。</li>
+      <li>上部のタブ（「トークルーム」または「ダイレクトメッセージ」）で検証対象を切り替えます。</li>
+      <li>画面最下部の<strong>「JSON保存」</strong>をクリックします。</li>
+      <li>自動的にページング（過去ログ読み込み）が実行され、完了後に該当ページのJSONファイルがダウンロードされます。</li>
     </ol>
   </div>
 
-  <div class="talkroom-mock">
+  <!-- Tab UI -->
+  <div class="test-tabs">
+    <button class="test-tab-btn is-active" onclick="switchTab('talkrooms')">トークルーム検証</button>
+    <button class="test-tab-btn" onclick="switchTab('direct_message')">ダイレクトメッセージ検証</button>
+  </div>
+
+  <!-- TALKROOM MOCK PANEL -->
+  <div id="panel-talkrooms" class="talkroom-mock is-active">
     <h2>トークルーム メッセージ一覧（モックDOM）</h2>
-    
-    <div data-v-41d71be6="" data-v-43f7ae04="" class="d-talkroomMessageList p-talkroomMessages_messageList" data-v-60ee68b6="">
-      
-      <!-- Mock Past Messages container containing the required button -->
-      <div data-v-41d71be6="" class="d-talkroomMessageList_showPastMessages">
-        <button type="submit" class="d-button is-outlined is-primary is-small" id="js-mock-load-btn" data-v-6285bdf2="" data-v-41d71be6="">
-          <span class="d-button_text" data-v-6285bdf2="">
-            過去のメッセージを見る
-          </span>
+    <div data-v-41d71be6="" class="d-talkroomMessageList p-talkroomMessages_messageList">
+      <div class="d-talkroomMessageList_showPastMessages">
+        <button type="submit" class="d-button is-outlined is-primary is-small" id="js-mock-tr-btn">
+          <span class="d-button_text">過去のメッセージを見る</span>
         </button>
       </div>
 
-      <div data-v-41d71be6="" class="d-messageGroup">
-        <div data-v-41d71be6="" class="d-messageGroup_date">5月29日</div>
-        <div data-v-32ff2f58="" data-v-41d71be6="" class="d-talkroomDefaultMessageList d-messageGroup_messageList">
-          <div data-v-2e06d8b7="" data-v-32ff2f58="" class="d-talkroomMessage d-talkroomDefaultMessage js-requestForPurchaseMessage">
-            <div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead">
-              <div data-v-216a351c="" class="d-messageInfo_userName">自分</div>
-              <span data-v-737e5f90="" class="d-label d-messageInfo_label">自動送信</span>
-              <div data-v-216a351c="" class="d-messageInfo_postTime">5月29日 21:43</div>
-            </div>
-            <div data-v-2e06d8b7="" class="d-talkroomMessage_main">
-              <div class="d-requestForPurchaseMessage_title_3jsUO">■ 購入にあたってのお願い</div>
-              <p class="d-requestForPurchaseMessage_text_2FFFF">ご購入前にDMにご連絡ください．</p>
-            </div>
+      <div class="d-messageGroup">
+        <div class="d-messageGroup_date">5月29日</div>
+        <div class="d-talkroomMessage d-talkroomDefaultMessage">
+          <div class="d-messageHead">
+            <div class="d-messageInfo_userName">自分</div>
+            <span class="d-label d-messageInfo_label">自動送信</span>
+            <div class="d-messageInfo_postTime">5月29日 21:43</div>
+          </div>
+          <div class="d-talkroomMessage_main">
+            <div class="d-requestForPurchaseMessage_title_3jsUO">■ 購入にあたってのお願い</div>
+            <p class="d-requestForPurchaseMessage_text_2FFFF">ご購入前にDMにご連絡ください．</p>
           </div>
         </div>
-        
-        <div data-v-41d71be6="" class="d-messageGroup_messageList" id="js-message-list-target">
-          <!-- Normal active room messages -->
-          <div data-v-2e06d8b7="" data-v-41d71be6="" class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214213467">
-            <div data-v-216a351c="" data-v-2e06d8b7="" class="d-messageHead">
-              <div data-v-216a351c="" class="d-messageInfo_userName">自分</div>
-              <div data-v-216a351c="" class="d-messageInfo_postTime">5月29日 22:15</div>
+
+        <div class="d-messageGroup_messageList" id="js-tr-message-container">
+          <div class="d-talkroomMessage d-messageListItem" id="js-talkroomMessage-214213467">
+            <div class="d-messageHead">
+              <div class="d-messageInfo_userName">自分</div>
+              <div class="d-messageInfo_postTime">5月29日 22:15</div>
             </div>
-            <div data-v-2e06d8b7="" class="d-talkroomMessage_main">
-              <p data-v-5e2aaa04="" class="d-normalMessage">ご購入ありがとうございます。引き続きよろしくお願いいたします。</p>
+            <div class="d-talkroomMessage_main">
+              <p class="d-normalMessage">ご購入ありがとうございます。引き続きよろしくお願いいたします。</p>
               <div class="d-talkroomMessage_readTime">既読 5月30日 20:37</div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- DIRECT MESSAGE MOCK PANEL -->
+  <div id="panel-direct_message" class="talkroom-mock">
+    <h2>ダイレクトメッセージ スレッド一覧（モックDOM）</h2>
+    
+    <div id="threadWrapper" class="js_thread-wrapper">
+      
+      <!-- DM Read more pagination mock button -->
+      <div class="read-more-message js_read-more-message" id="js-mock-dm-btn">
+        <p class="js_read-more-text">
+          <span>過去のメッセージを読み込む</span>
+          （<span class="direct-messages-count">13</span><span>件</span>）
+        </p>
+      </div>
+
+      <!-- INSERTED USER HTML -->
+      <div class="threadColomun clearfix ">
+        <div class="threadUser">
+          <a href="/users/6083892"><img src="/images/no_image_person.svg" class="threadUserImg" alt=""></a>
+        </div>
+        <div class="threadText">
+          <div class="threadHeader clearfix">
+            <div class="threadUserName">gapgmmtm</div>
+            <div class="threadPostTime">2026-05-30 13:12:29</div>
+          </div>
+          <div class="threadMessage">
+            <div class="js-translateMessage isTranslationEnabled">
+              <p class="translateMessage js-translateMessageOriginalMessage">こんにちは。<br>
+・大枠の開発の書式・仕様を検討していたところ、<br>
+スクレイピング2種のうちの1種の、時系列スクレイピングの見積り提案をお願いします。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="threadColomun clearfix ">
+        <div class="threadUser">
+          <a href="/users/1162327"><img src="/img/resized/120x120/1d925ab2b5bd790f7ec0f32c0f0f23860d7fb9d70236df68408285742270a126.jpg" class="threadUserImg" alt=""></a>
+        </div>
+        <div class="threadText">
+          <div class="threadHeader clearfix">
+            <div class="threadUserName">mei_13</div>
+            <div class="threadPostTime">2026-05-30 15:55:46</div>
+          </div>
+          <div class="threadMessage">
+            <div class="js-translateMessage isTranslationEnabled">
+              <p class="translateMessage js-translateMessageOriginalMessage">承知いたしました、大変恐縮ですがスクレイピングについては18,000円で考えており、ご希望の金額をオーバーしてしまいますが問題無いでしょうか。<br>
+よろしくお願いいたします。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="threadNotice">
+        <span>提案が変更されました</span>
+      </p>
 
     </div>
   </div>
 
-  <!-- Mock server-side paginated loader script for testing -->
   <script>
-    const mockBtn = document.getElementById('js-mock-load-btn');
-    const msgContainer = document.getElementById('js-message-list-target');
-    let clickCount = 0;
+    // Tab switching controller
+    function switchTab(tabName) {
+      document.querySelectorAll('.test-tab-btn').forEach(btn => {
+        btn.classList.remove('is-active');
+      });
+      document.querySelectorAll('.talkroom-mock').forEach(panel => {
+        panel.classList.remove('is-active');
+      });
 
-    if (mockBtn) {
-      mockBtn.addEventListener('click', (e) => {
+      // Update button visual
+      event.currentTarget.classList.add('is-active');
+      // Show matching panel
+      document.getElementById('panel-' + tabName).classList.add('is-active');
+      
+      // Update address hash to trigger extension path routing
+      window.location.hash = '#' + tabName;
+    }
+
+    // Initialize default hash on page load
+    window.location.hash = '#talkrooms';
+
+    // Mock Talkroom Loader Script
+    const mockTrBtn = document.getElementById('js-mock-tr-btn');
+    const trContainer = document.getElementById('js-tr-message-container');
+    let trClickCount = 0;
+
+    if (mockTrBtn) {
+      mockTrBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        mockBtn.disabled = true;
-        mockBtn.querySelector('.d-button_text').textContent = '過去ログ取得中...';
+        mockTrBtn.disabled = true;
+        mockTrBtn.querySelector('.d-button_text').textContent = '過去ログ取得中...';
 
         setTimeout(() => {
-          clickCount++;
-          
-          // Create dummy past messages to prepend to the list
+          trClickCount++;
           const dummyMsg = document.createElement('div');
           dummyMsg.className = 'd-talkroomMessage d-messageListItem';
           dummyMsg.innerHTML = `
             <div class="d-messageHead">
-              <div class="d-messageInfo_userName">過去の購入者 (モック履歴 ${clickCount})</div>
-              <div class="d-messageInfo_postTime">5月28日 1${clickCount}:00</div>
+              <div class="d-messageInfo_userName">過去の購入者 (TRモック ${trClickCount})</div>
+              <div class="d-messageInfo_postTime">5月28日 1${trClickCount}:00</div>
             </div>
             <div class="d-talkroomMessage_main">
-              <p class="d-normalMessage">自動スクロール展開テスト用の過去メッセージです。(${clickCount}回展開分)</p>
+              <p class="d-normalMessage">トークルーム自動スクロール展開テスト用の過去メッセージです。(${trClickCount}回目)</p>
+            </div>
+          `;
+          trContainer.insertBefore(dummyMsg, trContainer.firstChild);
+
+          if (trClickCount >= 3) {
+            mockTrBtn.parentElement.remove();
+          } else {
+            mockTrBtn.disabled = false;
+            mockTrBtn.querySelector('.d-button_text').textContent = '過去のメッセージを見る';
+          }
+        }, 800);
+      });
+    }
+
+    // Mock Direct Message Loader Script
+    const mockDmBtn = document.getElementById('js-mock-dm-btn');
+    const dmWrapper = document.getElementById('threadWrapper');
+    let dmClickCount = 0;
+
+    if (mockDmBtn) {
+      mockDmBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        mockDmBtn.classList.add('is-loading');
+        mockDmBtn.querySelector('.js_read-more-text span').textContent = '読み込み中...';
+
+        setTimeout(() => {
+          dmClickCount++;
+          const dummyCol = document.createElement('div');
+          dummyCol.className = 'threadColomun clearfix';
+          dummyCol.innerHTML = `
+            <div class="threadUser">
+              <a href="/users/999999"><img src="/images/no_image_person.svg" class="threadUserImg" alt=""></a>
+            </div>
+            <div class="threadText">
+              <div class="threadHeader clearfix">
+                <div class="threadUserName">DMモックユーザー (${dmClickCount})</div>
+                <div class="threadPostTime">2026-05-29 0${dmClickCount}:00:00</div>
+              </div>
+              <div class="threadMessage">
+                <div class="js-translateMessage isTranslationEnabled">
+                  <p class="translateMessage js-translateMessageOriginalMessage">ダイレクトメッセージ過去ログ展開テスト用の過去メッセージです。(${dmClickCount}回目)</p>
+                </div>
+              </div>
             </div>
           `;
           
-          msgContainer.insertBefore(dummyMsg, msgContainer.firstChild);
+          // Insert after pagination button (index 1)
+          dmWrapper.insertBefore(dummyCol, dmWrapper.children[1]);
 
-          if (clickCount >= 3) {
-            // After 3 mock fetches, remove the button to simulate "no more history"
-            mockBtn.parentElement.remove();
+          if (dmClickCount >= 3) {
+            mockDmBtn.style.display = 'none';
           } else {
-            // Re-enable for the next loop run
-            mockBtn.disabled = false;
-            mockBtn.querySelector('.d-button_text').textContent = '過去のメッセージを見る';
+            mockDmBtn.classList.remove('is-loading');
+            mockDmBtn.querySelector('.js_read-more-text span').textContent = '過去のメッセージを読み込む';
           }
-        }, 800); // Simulate API latency of 800ms
+        }, 800);
       });
     }
   </script>
